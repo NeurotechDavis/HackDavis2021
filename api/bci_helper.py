@@ -37,7 +37,7 @@ def record_eeg_filtered(r_length, freq, channel_i, notch = False, filter_state=N
 
         data, filter_state = lfilter(NOTCH_B, NOTCH_A, data, axis=0,
                                          zi=filter_state)
-    return data                                     
+    return data
 
 #def record_eeg(r_length, freq, channel_i):
 #	streams = resolve_byprop('type', 'EEG', timeout=2)
@@ -89,7 +89,7 @@ def update_buffer(data_buffer, new_data, notch = False, filter_state = None):
                                          zi = filter_state)
 
     new_buffer = np.concatenate((data_buffer, new_data), axis=0)
-    new_buffer = new_buffer[new_data.shape[0]:, :]
+    # new_buffer = new_buffer[new_data.shape[0]:, :]
 
     return new_buffer, filter_state
 
@@ -115,9 +115,9 @@ def epoch_array(eeg_data, epoch_length, overlap_length, freq):
 	n_total_samples, n_channels = eeg_data.shape
 
 	# convert seconds to number of samples
-	epoch_n_samples   = epoch_length * freq
-	overlap_n_samples = overlap_length * freq
-	shift_n_samples  = epoch_n_samples - overlap_n_samples
+	epoch_n_samples   = 256 #epoch_length * freq
+	overlap_n_samples = 205 #overlap_length * freq
+	shift_n_samples  = 51 #epoch_n_samples - overlap_n_samples
 
 	# total number of epochs
 	n_epochs = int(np.floor((n_total_samples - epoch_n_samples)
@@ -134,7 +134,7 @@ def epoch_array(eeg_data, epoch_length, overlap_length, freq):
 	for i in range(0, n_epochs):
 		epochs[:,:,i] = eeg_data[markers[i]:markers[i] + epoch_n_samples, :]
 
-		return epochs
+	return epochs
 
 
 def get_last_data(eeg_buffer, n_samples):
@@ -230,32 +230,38 @@ def compute_band_powers(epoch, freq):
 
 
 def compute_feature_matrix(epochs, freq):
-	""" Title: BCI Workshop Auxiliary Tools
-	Author: Cassani
-	Date: May 08 2015
-	Availability: https://github.com/NeuroTechX/bci-workshop """
-	""" Computes band powers for multiple epochs
-	Arguments:
-	epochs         -- 3D array of epochs [epoch_samples, channels, epochs]
-	freq           -- (float)sample rate
-	Returns:
-	feature_matrix -- matrix of epochs and corresponding features
-	-- [epochs][band powers]
-	"""
+    """ Title: BCI Workshop Auxiliary Tools
+    Author: Cassani
+    Date: May 08 2015
+    Availability: https://github.com/NeuroTechX/bci-workshop """
+    """ Computes band powers for multiple epochs
+    Arguments:
+    epochs         -- 3D array of epochs [epoch_samples, channels, epochs]
+    freq           -- (float)sample rate
+    Returns:
+    feature_matrix -- matrix of epochs and corresponding features
+    -- [epochs][band powers]
+    """
 
-	n_epochs = epochs.shape[2]
+    n_epochs = epochs.shape[2]
+    print(n_epochs)
 
-	# call compute_band_powers for each epoch
-	for epoch in range(n_epochs):
-		# first epoch initialze matrix
-		if epoch == 0:
-			feat           = compute_band_powers(epochs[:, :, epoch], freq).T
-			feature_matrix = np.zeros((n_epochs, feat.shape[0]))
+    # call compute_band_powers for each epoch
+    for epoch in range(n_epochs):
+        # first epoch initialze matrix
+        if epoch == 0:
+            feat = compute_band_powers(epochs[:, :, epoch], freq).T
+            feature_matrix = np.zeros((n_epochs, feat.shape[0]))
 
-			feature_matrix[epoch, :] = compute_band_powers(
-			epochs[:, :, epoch], freq).T
+        print(epoch)
+        print(epochs[:, :, epoch])
 
-			return feature_matrix
+        feature_matrix[epoch, :] = compute_band_powers(
+            epochs[:, :, epoch], freq).T
+        #print(feature_matrix)
+
+    return feature_matrix
+
 
 
 def calc_ratio(feature_matrix, baseline):

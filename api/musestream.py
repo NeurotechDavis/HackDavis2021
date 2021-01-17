@@ -21,7 +21,7 @@ class MuseStream:
 
     # Class Variables
     freq = 256
-    eeg_raw = np.zeros((int(freq * BUFFER_LENGTH), N_CHANNELS))
+    eeg_raw = np.ndarray(shape = (8,4))
     recording = False
     filter_state = None
     baseline = []
@@ -61,9 +61,8 @@ class MuseStream:
 
     def startRecording(self):
         self.recording = True
-        index = 0
         try:
-            while (index < 5):
+            while (self.recording == True):
                 streams = resolve_byprop('type', 'EEG', timeout=2)
                 inlet  = StreamInlet(streams[0], max_chunklen=12)
                 # Obtain EEG data from the LSL stream
@@ -78,12 +77,10 @@ class MuseStream:
                     ch_data,
                     notch=True,
                     filter_state = self.filter_state)
-                index=index +1
 
         except KeyboardInterrupt:
             print("Exception")
         #return json.dumps(self.eeg_raw)
-        print(self.eeg_raw)
         return " "
 
     # def processEEG(eeg_raw):
@@ -91,15 +88,18 @@ class MuseStream:
 
     def stopRecording(self):
         self.recording = False
+        print(self.eeg_raw)
         eeg_epochs = BCI.epoch_array(self.eeg_raw,
                     self.EPOCH_LENGTH,
                     self.OVERLAP_LENGTH * self.freq,
                     self.freq)
-        print(self.eeg_raw)
+        print(eeg_epochs.shape)
         feat_matrix = BCI.compute_feature_matrix(eeg_epochs,
                                             self.freq)
 
+
         percent_change = BCI.calc_ratio(feat_matrix, self.baseline)
+        print(percent_change)
         q75, q25 = np.percentile(percent_change, [75, 25])
         iqr = q75 - q25
         lower_bound = q25 - (1.5 * iqr)
