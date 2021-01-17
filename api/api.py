@@ -20,8 +20,7 @@ def home():
 
 @app.route('/start')
 def startRecord():
-    MuseStream.startRecording()
-    return "recording"
+    return MuseStream.startRecording()
 
 @app.route('/done')
 def stopRecording():
@@ -30,12 +29,12 @@ def stopRecording():
 
 """ @app.route('/record', methods=['POST','GET'])
 def MuseRecording():
-    
-    
+
+
     # http://127.0.0.1:5000/record
     if request.method == 'POST':
-        # RUN RECORDING FUNCTION HERE 
-         
+        # RUN RECORDING FUNCTION HERE
+
         return MuseStream.startRecording()
 
     if request.method == 'GET':
@@ -44,11 +43,3 @@ def MuseRecording():
 
     else:
         return "Method Not Allowed"  """
-        
-
-
-        
-
-
-
-

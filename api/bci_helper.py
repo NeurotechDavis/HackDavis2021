@@ -37,7 +37,7 @@ def record_eeg_filtered(r_length, freq, channel_i, notch = False, filter_state=N
 
         data, filter_state = lfilter(NOTCH_B, NOTCH_A, data, axis=0,
                                          zi=filter_state)
-
+    return data                                     
 
 #def record_eeg(r_length, freq, channel_i):
 #	streams = resolve_byprop('type', 'EEG', timeout=2)
@@ -52,8 +52,8 @@ def record_eeg_filtered(r_length, freq, channel_i, notch = False, filter_state=N
 #	data      -- array of recorded data [sample, channel]
 #	"""
 #
-#	data, timestamps = inlet.pull_chunk( 
-#		timeout = r_length + 1, 
+#	data, timestamps = inlet.pull_chunk(
+#		timeout = r_length + 1,
 #		max_samples = int(freq * r_length))
 #
 #	data = np.array(data)[:, channel_i]
@@ -65,7 +65,7 @@ def update_buffer(data_buffer, new_data, notch = False, filter_state = None):
     """ Title: BCI Workshop Auxiliary Tools
 	Author: Cassani
 	Date: May 08 2015
-	Availability: https://github.com/NeuroTechX/bci-workshop 
+	Availability: https://github.com/NeuroTechX/bci-workshop
 	Updates the buffer with new data and applies butterworth filter
 	Arguments:
 	buffer       -- array for eeg data buffer [samples][channels]
@@ -75,16 +75,16 @@ def update_buffer(data_buffer, new_data, notch = False, filter_state = None):
 	Returns:
 	new_buffer   -- array of updated buffer [samples][channels]
 	"""
-	
+
     if new_data.ndim == 1:
 
         new_data = new_data.reshape(-1, data_buffer.shape[1])
-	
+
     if notch:
         if filter_state is None:
             filter_state = np.tile(lfilter_zi(NOTCH_B, NOTCH_A),
                                    (data_buffer.shape[1], 1)).T
-        
+
         new_data, filter_state = lfilter(NOTCH_B, NOTCH_A, new_data, axis=0,
                                          zi = filter_state)
 
@@ -115,9 +115,9 @@ def epoch_array(eeg_data, epoch_length, overlap_length, freq):
 	n_total_samples, n_channels = eeg_data.shape
 
 	# convert seconds to number of samples
-	epoch_n_samples   = 256 # epoch_length * freq
-	overlap_n_samples = 205 # overlap_length * freq
-	shift_n_samples  = 51 # epoch_n_samples - overlap_n_samples
+	epoch_n_samples   = epoch_length * freq
+	overlap_n_samples = overlap_length * freq
+	shift_n_samples  = epoch_n_samples - overlap_n_samples
 
 	# total number of epochs
 	n_epochs = int(np.floor((n_total_samples - epoch_n_samples)
@@ -286,9 +286,3 @@ def calc_baseline(feature_matrix):
 
     baseline_val = sum(ratio_arr)/len(ratio_arr)
     return baseline_val
-
-
-
-
-
-
