@@ -110,6 +110,6 @@ class MuseStream:
             if (percent_change[x] < lower_bound):
                 percent_change[x] = np.median(percent_change)
         # return percent_change
-        #data = self.processEEG(self.eeg_raw)
-
+        # data = self.processEEG(self.eeg_raw)
+        self.eeg_raw = []
         return jsonify(percent_change)
