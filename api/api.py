@@ -18,11 +18,11 @@ def get_current_time():
 def home():
     return "nothing here"
 
-@app.route('/start', methods=['POST'])
+@app.route('/start')
 def startRecord():
     return MuseStream.startRecording()
 
-@app.route('/done', methods = ['GET'])
+@app.route('/done')
 def stopRecording():
     return MuseStream.stopRecording()
 
